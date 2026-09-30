@@ -86,6 +86,11 @@
   .track { background: #E3E9F0; height: 9pt; border-radius: 2pt; overflow: hidden; }
   .fill { height: 100%; display: flex; align-items: center; justify-content: flex-end; padding-right: 5pt;
           color: #fff; font-size: 6.4pt; font-weight: 700; }
+  .cmp { background: #F7F9FC; border: .6pt solid var(--line); border-radius: 4pt; padding: 9pt 12pt; }
+  .cmp h4 { font-family: var(--serif); color: var(--navy); font-size: 9.5pt; margin: 0 0 7pt; }
+  .cmprow { display: grid; grid-template-columns: 70pt 1fr; gap: 8pt; align-items: start; margin-bottom: 5pt; font-size: 7.6pt; }
+  .cmprow b { color: var(--navy); }
+  .cmprow.new b { color: var(--green); }
   .four { display: grid; grid-template-columns: repeat(4, 1fr); gap: 11pt; margin-top: 9pt; }
   .four ul { padding-left: 9pt; } .four li { font-size: 7pt; }
 
@@ -306,38 +311,40 @@
   <h1>FEASIBILITY AND VIABILITY</h1>
   <div class="sub">Analysis of the feasibility of the idea</div>
 
-  <div class="kicker">MEASURED ON OUR OWN SYSTEM — 18-photo aerial sample, one A100 (ref. 15)</div>
+  <div class="kicker">PUBLISHED RESEARCH VS. WHAT WE HAVE MEASURED</div>
   <table>
-    <tr><th style="width:27%">What we measured</th><th style="width:36%">Result</th><th>What it does not show</th></tr>
-    <tr><td>End-to-end reconstruction</td><td>1.13 M coloured points in 29.8 s (5.9 s inference)</td>
-        <td>One sample, and a photo set — not a full-length flight video</td></tr>
-    <tr><td>Agreement with the photos' own GPS</td><td>1.43 m RMSE; 1.62 m leave-one-out</td>
-        <td><b>Agreement with input GPS, not ground accuracy.</b> No surveyed checkpoints exist for this sample</td></tr>
-    <tr><td>Learned metric scale vs GPS</td><td>3.96× too small; GPS alignment corrects it</td>
-        <td>Confirms the model's own scale cannot be trusted on aerial scenes</td></tr>
-    <tr><td>Degenerate input handling</td><td>Single flight line refused (s₂/s₁ = 0.009)</td>
-        <td>Refusal is the correct result, not a reconstruction</td></tr>
+    <tr><th style="width:30%">What we're measuring, in plain terms</th><th style="width:30%">Published research finding (ref. 1)</th><th>OnePass: measured so far</th></tr>
+    <tr><td>How much of the map has no holes, with only a few, barely-overlapping photos of the area</td>
+        <td>Newer AI methods leave fewer blank patches than the older standard method</td>
+        <td>Not yet tested. To be confirmed by running the same test on our own system</td></tr>
+    <tr><td>How far the model's position can be off from the real spot on the ground</td>
+        <td>Not tested in the cited study: it didn't use GPS</td>
+        <td>The aligned cloud agrees with the photos' own GPS to about 1.4 m. That is agreement with input GPS, <b>not</b> ground accuracy, which is not yet measured</td></tr>
   </table>
+  <div class="note">1. Wu, Landgraf, Ulrich &amp; Qin (2025), UseGeo benchmark, full citation on slide 6.</div>
 
-  <div class="cols" style="grid-template-columns:1fr 1fr;gap:16pt;margin-top:10pt">
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:16pt;margin-top:8pt">
     <div>
-      <h3>NEXT GATE</h3>
-      <ul>
-        <li>A <b>real</b> drone video with its SRT through the upload path (only a synthetic video has been tested)</li>
-        <li>Same frames through the COLMAP track — inter-method agreement</li>
-        <li>Independent accuracy on a benchmark with ground truth (UseGeo, ref. 1–3)</li>
-      </ul>
-      <div class="note">Published work reports newer feed-forward methods leaving ~19% fewer blank patches than the
-        standard method (ref. 1); that study did not use GPS. We have not reproduced it on our system.</div>
+      <h3>EVALUATION CRITERIA</h3>
+      <table>
+        <tr><th>Metric</th><th>Proves</th></tr>
+        <tr><td><b>Single strip vs full grid, same site</b></td><td><b>The core question</b></td></tr>
+        <tr><td>Position error vs known ground points</td><td>Real-world accuracy</td></tr>
+        <tr><td>Size error over known distances</td><td>Correct real-world scale</td></tr>
+        <tr><td>Surface match vs laser scan</td><td>Shape accuracy</td></tr>
+        <tr><td>Coverage, counting only reliable areas</td><td>Honest coverage</td></tr>
+      </table>
     </div>
     <div>
       <h3>RISKS AND MITIGATIONS</h3>
       <table>
-        <tr><th style="width:44%">Risk</th><th>Mitigation and status</th></tr>
-        <tr><td>Shape uncertain with one flight path</td><td>Refuses to geolocate collinear tracks <span class="tag built">BUILT</span></td></tr>
-        <tr><td>Learned scale unreliable</td><td>Post-hoc GPS similarity <span class="tag built">BUILT</span></td></tr>
-        <tr><td>Unseen / occluded surfaces</td><td>Per-point cross-view agreement, filterable <span class="tag built">BUILT</span></td></tr>
-        <tr><td>Moving vehicles and people</td><td>Segmentation + motion masking <span class="tag todo">PLANNED</span></td></tr>
+        <tr><th style="width:40%">Risk</th><th>Mitigation</th></tr>
+        <tr><td>Sideways shape is less certain with only one flight path</td>
+            <td>GPS-constrained alignment; refuses tracks that cannot fix rotation <span class="tag built">BUILT</span> Adaptive keyframes <span class="tag todo">PLANNED</span></td></tr>
+        <tr><td>Moving vehicles and people</td>
+            <td>Segmentation and motion masking <span class="tag todo">PLANNED</span></td></tr>
+        <tr><td>Unseen / occluded surfaces</td>
+            <td>Per-point confidence shown, low-agreement points can be hidden <span class="tag built">BUILT</span></td></tr>
       </table>
     </div>
   </div>
@@ -351,32 +358,31 @@
   <h1>IMPACT AND BENEFITS</h1>
   <div class="sub">Potential impact on the target audience · Benefits of the solution (social, economic, environmental, etc.)</div>
 
-  <div class="bars">
+  <div class="cmp">
     <h4>The bottleneck: time</h4>
-    <div class="kicker" style="margin-bottom:4pt">MOBILIZATION &amp; ASSESSMENT</div>
-    <div class="barrow"><span>Traditional</span><div class="track"><div class="fill" style="width:100%;background:var(--bar)">7 days</div></div><span>&nbsp;</span></div>
-    <div class="barrow"><span>AI-assisted</span><div class="track"><div class="fill" style="width:13%;background:var(--green)"></div></div><span><b>1 day</b> · &gt;90% less</span></div>
-    <div class="kicker" style="margin:7pt 0 4pt">PROCESSING AT SCALE (2,000 SITES)</div>
-    <div class="barrow"><span>Traditional</span><div class="track"><div class="fill" style="width:100%;background:var(--bar)">Hours</div></div><span>&nbsp;</span></div>
-    <div class="barrow"><span>AI-assisted</span><div class="track"><div class="fill" style="width:5%;background:var(--green)"></div></div><span><b>7 minutes</b> · &gt;99% less</span></div>
-    <div class="note">Sources: SkyeBrowse (2026) processing benchmark, ref. 14; Texas A&amp;M / Project CLARKE
-      mobilization benchmark, ref. 12 — both external. <b>Our own measured run:</b> 18 aerial views → 1.13 M points in 29.8 s on one A100 (ref. 15).</div>
+    <div class="cmprow"><b>Traditional</b><span>Several overlapping flights, ground markers placed beforehand, and processing back at base.</span></div>
+    <div class="cmprow new"><b>With OnePass</b><span>One flight, no markers, and processing on a laptop at the point of capture.</span></div>
+    <div class="note" style="margin-top:6pt"><b>Measured on the prototype:</b> 18 aerial photos became a 1.13 million-point coloured cloud in 29.8 s on one GPU.
+      This is a photo set, not a full-length flight video, so it says nothing yet about long flights.</div>
   </div>
 
   <div class="four">
     <div><h3>OPERATIONAL</h3><ul>
       <li>Removes the ground-marker survey step (ref. 13)</li>
-      <li>Runs on-premise and offline, at the point of capture — verified</li></ul></div>
+      <li>Runs on a laptop, offline, at the point of capture</li></ul></div>
     <div><h3>SECTORS</h3><ul>
-      <li>Disaster/flood response: 119 drone flights already mapped one hurricane's damage (ref. 12)</li>
+      <li>Disaster and flood response, where teams often get one flight (ref. 12)</li>
       <li>Border mapping, infrastructure, archaeology</li></ul></div>
     <div><h3>ECONOMIC</h3><ul>
-      <li>Skips a survey crew + RTK-GPS gear, $1,000–2,000 per site-day (ref. 13)</li>
+      <li>No survey crew or RTK-GPS equipment needed on site (ref. 13)</li>
       <li>No repeat flights, no per-seat licence</li></ul></div>
     <div><h3>ENVIRONMENTAL &amp; SOCIAL</h3><ul>
       <li>Fewer flight hours per survey</li>
-      <li>Same-day response vs 3–7 days traditionally (ref. 11)</li></ul></div>
+      <li>Faster response than traditional mapping (ref. 11)</li></ul></div>
   </div>
+
+  <div class="note" style="margin-top:12pt">11. Overwatch Mapping (2026), drone disaster-response reporting. 12. CRASAR, Texas A&amp;M, Hurricane Harvey UAV deployment (DroneLife, 2025).
+    13. Industry cost estimates for RTK ground-control survey crews and equipment. Full citations on slide 6.</div>
 
   <div class="foot"><b>5</b>@SIH Idea submission- Template</div>
 </section>
