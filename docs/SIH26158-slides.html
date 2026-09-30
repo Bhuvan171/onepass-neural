@@ -66,6 +66,9 @@
   .stage p { margin: 0; font-size: 7pt; line-height: 1.32; }
   .stage code { font-family: var(--sans); color: var(--muted); font-size: 6.5pt; }
   .shot { width: 100%; display: block; border: .8pt solid var(--line); border-radius: 3pt; }
+  figure { margin: 0; }
+  .flow { display: block; width: 100%; height: auto; }
+  figcaption { font-size: 6.2pt; color: var(--muted); line-height: 1.35; margin-top: 3pt; }
   .measured { background: var(--pill); border-left: 2.4pt solid var(--blue); padding: 4.5pt 8pt; margin-top: 5pt; font-size: 7pt; }
   .measured b { color: var(--navy); }
   .planned { margin-top: 7pt; background: #F7F8FA; border: .6pt solid var(--line); border-radius: 3pt; padding: 4.5pt 8pt; font-size: 7pt; }
@@ -166,48 +169,132 @@
   <h1>TECHNICAL APPROACH</h1>
   <div class="sub">Methodology and process for implementation (Flow Charts/Images/working prototype)</div>
 
-  <div class="cols">
-    <div>
-      <h3>NEURAL TRACK — IMPLEMENTED, RUNS END TO END <span class="tag built">BUILT</span></h3>
-      <div class="stage"><i>1</i><div><b>Ingest</b> <code>selection.py</code>
-        <p>ffmpeg decode at a fixed fps; EXIF GPS, or DJI SRT matched by timestamp (≤ 0.5 s gap, no interpolation).</p></div></div>
-      <div class="stage"><i>2</i><div><b>Select</b> <code>selection.py</code>
-        <p>Rejects blur (&lt; 25% of the set's median Laplacian variance) and bad exposure, then samples evenly to the frame budget.</p></div></div>
-      <div class="stage"><i>3</i><div><b>Reconstruct</b> <code>infer.py</code>
-        <p>MapAnything <code>map-anything-apache</code> @ 00f9c245, bf16 — one feed-forward pass over all views gives poses and depth. No bundle adjustment.</p></div></div>
-      <div class="stage"><i>4</i><div><b>Georeference</b> <code>georef.py</code>
-        <p>Umeyama similarity + RANSAC, camera centres to GPS in local ENU. Refuses near-collinear tracks (s₂/s₁ &lt; 0.1).</p></div></div>
-      <div class="stage"><i>5</i><div><b>Fuse and export</b> <code>fuse.py</code>
-        <p>Voxel downsample; binary PLY carrying per-point cross-view agreement, confidence and view id.</p></div></div>
-      <div class="stage"><i>6</i><div><b>Serve</b> <code>server.py</code>
-        <p>FastAPI worker, one cancellable subprocess per job; three.js viewer; hashed run manifests.</p></div></div>
+  <h3>NEURAL TRACK — IMPLEMENTED, RUNS END TO END <span class="tag built">BUILT</span></h3>
 
-      <div class="measured"><b>MEASURED</b> — A100 80GB, 18 aerial photos: <b>1,134,767 points in 29.8 s</b>
+  <figure>
+    <svg class="flow" viewBox="0 0 652 96" role="img"
+         aria-label="Pipeline: photos with EXIF GPS or video with DJI SRT feed ingest and selection, then feed-forward reconstruction, then a decision on whether GPS is usable. If yes, georeference to local ENU; if the flight track is near-collinear the run is not geolocated and keeps the model frame with GPS scale only. Both paths rejoin at fuse and export, then the browser viewer.">
+      <defs>
+        <marker id="ab" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5.5" markerHeight="5.5" orient="auto">
+          <path d="M0,0.7 L8,4 L0,7.3 Z" fill="#1F6FB4"/>
+        </marker>
+        <marker id="aa" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5.5" markerHeight="5.5" orient="auto">
+          <path d="M0,0.7 L8,4 L0,7.3 Z" fill="#C8781F"/>
+        </marker>
+      </defs>
+      <g font-family="Arial, Helvetica, sans-serif">
+
+        <!-- inputs -->
+        <g fill="#EDF2F9" stroke="#8FA9C4" stroke-width=".7">
+          <rect x="0" y="4"  width="74" height="18" rx="2.5"/>
+          <rect x="0" y="28" width="74" height="18" rx="2.5"/>
+        </g>
+        <g font-size="5.4" fill="#2b3948" text-anchor="middle">
+          <text x="37" y="15.4">Photos + EXIF GPS</text>
+          <text x="37" y="39.4">Video + DJI SRT</text>
+        </g>
+
+        <!-- stage boxes -->
+        <g fill="#F2F6FB" stroke="#1F6FB4" stroke-width=".8">
+          <rect x="90"  y="6" width="82" height="38" rx="3"/>
+          <rect x="188" y="6" width="82" height="38" rx="3"/>
+          <rect x="362" y="6" width="82" height="38" rx="3"/>
+          <rect x="460" y="6" width="82" height="38" rx="3"/>
+          <rect x="558" y="6" width="82" height="38" rx="3"/>
+        </g>
+        <g fill="#1F6FB4">
+          <circle cx="100" cy="15" r="5"/><circle cx="198" cy="15" r="5"/>
+          <circle cx="372" cy="15" r="5"/><circle cx="470" cy="15" r="5"/><circle cx="568" cy="15" r="5"/>
+        </g>
+        <g font-size="5.2" fill="#fff" text-anchor="middle" font-weight="bold">
+          <text x="100" y="16.9">1</text><text x="198" y="16.9">2</text>
+          <text x="372" y="16.9">3</text><text x="470" y="16.9">4</text><text x="568" y="16.9">5</text>
+        </g>
+        <g font-size="6.2" font-weight="bold" fill="#1F497D">
+          <text x="109" y="17.2">Ingest + select</text>
+          <text x="207" y="17.2">Reconstruct</text>
+          <text x="381" y="17.2">Georeference</text>
+          <text x="479" y="17.2">Fuse + export</text>
+          <text x="577" y="17.2">Serve</text>
+        </g>
+        <g font-size="5.2" fill="#556373">
+          <text x="96" y="29">ffmpeg decode at a set fps;</text>
+          <text x="96" y="37">blur + exposure reject</text>
+          <text x="194" y="29">MapAnything — one</text>
+          <text x="194" y="37">feed-forward pass</text>
+          <text x="368" y="29">Umeyama + RANSAC</text>
+          <text x="368" y="37">to local ENU metres</text>
+          <text x="466" y="29">voxel downsample,</text>
+          <text x="466" y="37">binary PLY</text>
+          <text x="564" y="29">browser viewer, PLY,</text>
+          <text x="564" y="37">hashed manifests</text>
+        </g>
+
+        <!-- decision -->
+        <polygon points="312,3 347,25 312,47 277,25" fill="#FBF0E2" stroke="#C8781F" stroke-width=".8"/>
+        <g text-anchor="middle" fill="#8a5a15">
+          <text x="312" y="24" font-size="5.4" font-weight="bold">GPS usable?</text>
+          <text x="312" y="31.5" font-size="4.8">s₂/s₁ ≥ 0.1</text>
+        </g>
+
+        <!-- refusal branch -->
+        <rect x="248" y="62" width="168" height="28" rx="3" fill="#FBF0E2" stroke="#C8781F" stroke-width=".8"/>
+        <text x="332" y="73" font-size="5.4" font-weight="bold" fill="#8a5a15" text-anchor="middle">Not geolocated</text>
+        <text x="332" y="81.5" font-size="5" fill="#8a5a15" text-anchor="middle">model frame + GPS scale only</text>
+
+        <!-- arrows -->
+        <g fill="none" stroke="#1F6FB4" stroke-width=".9">
+          <polyline points="74,13 82,13 82,25"/>
+          <polyline points="74,37 82,37 82,25"/>
+          <line x1="82"  y1="25" x2="89"  y2="25" marker-end="url(#ab)"/>
+          <line x1="172" y1="25" x2="187" y2="25" marker-end="url(#ab)"/>
+          <line x1="270" y1="25" x2="276" y2="25" marker-end="url(#ab)"/>
+          <line x1="347" y1="25" x2="361" y2="25" marker-end="url(#ab)"/>
+          <line x1="444" y1="25" x2="459" y2="25" marker-end="url(#ab)"/>
+          <line x1="542" y1="25" x2="557" y2="25" marker-end="url(#ab)"/>
+        </g>
+        <g fill="none" stroke="#C8781F" stroke-width=".9">
+          <line x1="312" y1="47" x2="312" y2="61" marker-end="url(#aa)"/>
+          <polyline points="416,76 501,76 501,45" marker-end="url(#aa)"/>
+        </g>
+
+        <!-- arrow labels -->
+        <g font-size="4.8" fill="#8a5a15" font-weight="bold">
+          <text x="354" y="21.5" text-anchor="middle">yes</text>
+          <text x="318" y="57">no — near-collinear track</text>
+        </g>
+      </g>
+    </svg>
+    <figcaption><b>Parameters as implemented:</b> DJI SRT matched by timestamp, ≤ 0.5 s gap, no interpolation · blur reject below 25% of the set's median
+      Laplacian variance · <code>map-anything-apache</code> @ 00f9c245, bf16, GPU capped at 48% · refusal threshold s₂/s₁ &lt; 0.1 · binary PLY carrying
+      per-point cross-view agreement, confidence and view id. Modules: <code>selection.py · infer.py · georef.py · fuse.py · server.py</code>.</figcaption>
+  </figure>
+
+  <div class="cols" style="margin-top:8pt">
+    <div>
+      <div class="measured" style="margin-top:0"><b>MEASURED</b> — A100 80GB, 18 aerial photos: <b>1,134,767 points in 29.8 s</b>
         (18.7 s model load, 5.9 s reconstruct), 11.1 GB peak GPU. Agreement with the photos' own GPS 1.43 m RMSE.
         Offline run verified in a network-less namespace.</div>
-    </div>
-
-    <div>
-      <img class="shot" src="screenshots/static_demo_video_run.png" alt="OnePass viewer showing a reconstructed point cloud">
-      <div class="note">Working prototype: a stored run in the browser viewer — video + SRT, 18 frames,
-        1,025,708 points, camera poses in gold. Live: <b>bhuvan171.github.io/onepass-neural</b> (ref. 15).</div>
-
-      <div class="planned" style="margin-top:9pt">
+      <div class="planned">
         <b>PLANNED — NOT IMPLEMENTED</b>
         <ul style="margin-top:3pt">
           <li>Parallax-aware keyframe selection (current selector is interval-based)</li>
           <li>Same frames through the COLMAP track; report inter-method agreement</li>
           <li>Tier 2–3: dense MVS / Gaussian splatting, Poisson mesh</li>
           <li>Moving-object masking; LAS/GLB/OBJ/GeoTIFF export; measurement tools</li>
-          <li>Independent accuracy evaluation against surveyed checkpoints</li>
         </ul>
       </div>
     </div>
+    <div>
+      <img class="shot" src="screenshots/static_demo_video_run.png" alt="OnePass viewer showing a reconstructed point cloud">
+      <div class="note">Working prototype — a stored run: video + SRT, 18 frames, 1,025,708 points.
+        Live at <b>bhuvan171.github.io/onepass-neural</b> (ref. 15).</div>
+    </div>
   </div>
 
-  <div class="note" style="margin-top:7pt;font-style:italic;text-align:center;border-top:.6pt solid var(--line);padding-top:5pt">
-    Fully offline and on-premise — no cloud service, no external API. Weights are the <b>Apache-2.0</b> MapAnything
-    checkpoint; the CC-BY-NC checkpoint is never downloaded. Two dependencies (plyfile GPL-3.0, system FFmpeg) are still under licence review.
+  <div class="note" style="margin-top:6pt;font-style:italic;text-align:center;border-top:.6pt solid var(--line);padding-top:4pt">
+    Fully offline and on-premise — no cloud, no external API. <b>Apache-2.0</b> MapAnything weights; the CC-BY-NC checkpoint is never
+    downloaded. plyfile (GPL-3.0) and the system FFmpeg build are still under licence review.
   </div>
 
   <div class="foot"><b>3</b>@SIH Idea submission- Template</div>
