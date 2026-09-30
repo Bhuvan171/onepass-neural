@@ -1,0 +1,8 @@
+.venv/
+.hf/
+.torch/
+third_party/
+data/
+runs/
+__pycache__/
+.pytest_cache/

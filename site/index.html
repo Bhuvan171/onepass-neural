@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en" data-static="1">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OnePass — neural preview</title>
+<style>
+  :root {
+    --navy: #17324d; --blue: #1a73c8; --blue-dark: #155da3; --accent: #4F81BD; --panel: #ffffff; --bg: #eef2f7;
+    --border: #dbe3ec; --amber: #E0932A; --text: #1b2733; --muted: #5f6f80; --bad: #b3261e; --good: #2d6a3a;
+    --font: system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14px/1.5 var(--font); color: var(--text); background: var(--bg); height: 100vh; display: flex; flex-direction: column; }
+  header { background: var(--navy); color: #fff; padding: 10px 18px; display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; box-shadow: 0 1px 4px rgba(0,0,0,.25); z-index: 2; }
+  header h1 { font: 700 18px var(--font); margin: 0; letter-spacing: .02em; }
+  header span { opacity: .75; font-size: 12px; }
+  main { flex: 1; display: grid; grid-template-columns: 300px 1fr 320px; gap: 10px; padding: 10px; min-height: 0; }
+  aside { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; overflow-y: auto; padding: 14px; }
+  h2 { font: 700 11px var(--font); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 18px 0 8px; padding-bottom: 4px; border-bottom: 1px solid var(--border); }
+  h2:first-child { margin-top: 0; }
+  select, input[type=number] { width: 100%; margin: 3px 0 6px; font: inherit; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; background: #fff; color: var(--text); }
+  input[type=file] { width: 100%; margin: 3px 0 6px; font: inherit; font-size: 12px; padding: 8px; border: 1px dashed var(--accent); border-radius: 6px; background: #f6f9fd; }
+  input[type=checkbox], input[type=radio], input[type=range] { accent-color: var(--blue); }
+  button { font: inherit; font-weight: 600; padding: 7px 14px; border: 1px solid var(--blue); background: var(--blue); color: #fff; border-radius: 6px; cursor: pointer; transition: background .15s; }
+  button:hover:not(:disabled) { background: var(--blue-dark); }
+  button.secondary { background: #fff; color: var(--blue); }
+  button.secondary:hover:not(:disabled) { background: #eaf3fc; }
+  button#run { flex: 1; }
+  button:disabled { opacity: .5; cursor: default; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 6px 0; }
+  .muted { color: var(--muted); font-size: 12px; }
+  .state { font-weight: 700; text-transform: capitalize; }
+  .state.succeeded { color: var(--good); } .state.failed, .state.cancelled { color: var(--bad); } .state.running, .state.queued { color: var(--blue); }
+  .spinner { display: inline-block; width: 11px; height: 11px; border: 2px solid var(--accent); border-right-color: transparent; border-radius: 50%; animation: spin .8s linear infinite; vertical-align: -1px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  ol.stages { padding-left: 18px; margin: 6px 0; } ol.stages li { margin: 2px 0; }
+  .frames { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .frames figure { margin: 0; position: relative; }
+  .frames img { width: 100%; display: block; border: 2px solid var(--blue); border-radius: 4px; }
+  .frames figure.rej img { border-color: #aab4bf; opacity: .45; }
+  .frames figcaption { font-size: 10px; color: var(--muted); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  #viewer { position: relative; background: #121821; min-width: 0; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+  #viewer canvas { display: block; width: 100%; height: 100%; }
+  .banner { position: absolute; top: 12px; left: 12px; right: 12px; background: rgba(224,147,42,.95); color: #1b1300; padding: 7px 12px; border-radius: 6px; font-weight: 700; text-align: center; display: none; }
+  .overlay { position: absolute; bottom: 12px; left: 12px; color: #dde5ee; font-size: 12px; background: rgba(0,0,0,.55); padding: 6px 10px; border-radius: 6px; }
+  .empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #8a99a8; text-align: center; padding: 20px; font-size: 15px; }
+  table { width: 100%; border-collapse: collapse; }
+  td { padding: 4px 0; border-bottom: 1px solid var(--border); vertical-align: top; }
+  td:first-child { color: var(--muted); width: 46%; padding-right: 8px; }
+  .legend { height: 10px; border-radius: 3px; background: linear-gradient(90deg, var(--amber), #0070C0); margin: 6px 0 2px; }
+  .note { background: #f6f9fd; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; margin: 8px 0; font-size: 12px; }
+  .note.warn { border-color: var(--amber); background: #fff8ec; }
+  a { color: var(--blue); }
+  body.static .live-only { display: none; }
+  .static-only { display: none; } body.static .static-only { display: block; }
+  a.dl { display: inline-block; margin-top: 8px; margin-right: 8px; }
+  a.dl button { text-decoration: none; }
+  label { user-select: none; }
+  @media (max-width: 1000px) {
+    body { height: auto; min-height: 100vh; }
+    main { grid-template-columns: 1fr; }
+    #viewer { height: 60vh; order: -1; }
+  }
+</style>
+</head>
+<body>
+<header><h1>OnePass</h1><span>sixth harmony · SIH26158 · neural preview backend (MapAnything, Apache-2.0 checkpoint)</span></header>
+<main>
+  <aside>
+    <h2>Input</h2>
+    <div class="note static-only">Static demo: these are <b>pre-computed runs</b> exported from the GPU backend. Reconstruction runs only on the GPU server, so there is no upload here.</div>
+    <div class="live-only">
+    <select id="sample"></select>
+    <div class="muted">or upload images, or one video + optional DJI .srt</div>
+    <input type="file" id="files" multiple accept=".jpg,.jpeg,.png,.mp4,.mov,.mkv,.avi,.srt">
+    <div class="row"><span class="muted">Frame budget</span><input type="number" id="maxViews" value="40" min="2" max="200" style="width:60px"><span class="muted">Video fps</span><input type="number" id="fps" value="2" min="0.1" max="10" step="0.5" style="width:55px"></div>
+    <div class="row"><button id="run">Reconstruct</button><button id="cancel" class="secondary" disabled>Cancel</button></div>
+    </div>
+
+    <h2>Job</h2>
+    <div id="jobInfo" class="muted">No job selected.</div>
+    <ol class="stages" id="stages"></ol>
+
+    <h2>Frames</h2>
+    <div class="muted" id="framesInfo">Selector: quality-filtered interval sampling (not parallax-aware).</div>
+    <div class="frames" id="frames"></div>
+
+    <h2 id="histTitle">Stored runs</h2>
+    <select id="history"></select>
+  </aside>
+
+  <section id="viewer">
+    <div class="empty" id="empty">Choose an input and press Reconstruct.<br>Only the output of a successful run is shown.</div>
+    <div class="banner" id="banner">AI preview — spatial accuracy not validated</div>
+    <div class="overlay" id="overlay" style="display:none"></div>
+  </section>
+
+  <aside class="right">
+    <h2>View</h2>
+    <div class="row"><button class="secondary" id="reset">Reset view</button>
+      <label><input type="checkbox" id="showCams" checked> cameras</label></div>
+    <div class="row"><span class="muted">Point size</span><input type="range" id="psize" min="1" max="8" value="2" style="flex:1"></div>
+    <div class="row"><label><input type="radio" name="cmode" value="rgb" checked> image colour</label>
+      <label><input type="radio" name="cmode" value="mvc"> cross-view agreement</label></div>
+    <div id="legendBox" style="display:none">
+      <div class="legend"></div>
+      <div class="row muted" style="justify-content:space-between"><span>0: views disagree</span><span>1: all agree</span></div>
+      <div class="muted">Fraction of overlapping views whose <em>predicted</em> depth agrees. Model self-consistency — not triangulation, not accuracy.</div>
+    </div>
+    <label><input type="checkbox" id="hideLow"> hide points with agreement &lt; 0.5</label>
+
+    <h2>Run summary</h2>
+    <div id="summary" class="muted">—</div>
+    <h2>GPS alignment</h2>
+    <div id="geo" class="muted">—</div>
+    <h2>Limitations</h2>
+    <div class="note warn" id="limits">
+      Neural preview: geometry is a model prediction. No independent accuracy validation has been done.
+      Measurement tools are disabled. Altitude datum unknown.
+    </div>
+  </aside>
+</main>
+
+<script type="importmap">{ "imports": { "three": "./vendor/three.module.js" } }</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from './vendor/OrbitControls.js';
+import { PLYLoader } from './vendor/PLYLoader.js';
+
+const $ = id => document.getElementById(id);
+// Live mode talks to the FastAPI server; static mode (GitHub Pages) reads exported runs from data/.
+const STATIC = document.documentElement.dataset.static === '1';
+const urlList = () => STATIC ? 'data/jobs.json' : '/api/jobs';
+const urlJob = id => STATIC ? `data/${id}/job.json` : `/api/jobs/${id}`;
+const urlFile = (id, name) => STATIC ? `data/${id}/${name}` : `/api/jobs/${id}/file/${name}`;
+if (STATIC) document.body.classList.add('static');
+const viewer = $('viewer');
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(window.devicePixelRatio);
+viewer.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x121821);
+const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 5000);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+
+let cloud = null, cams = null, full = null, homeView = null, currentJob = null, sessionJobs = new Set(), pollTimer = null;
+
+function resize() {
+  const w = viewer.clientWidth, h = viewer.clientHeight;
+  renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+}
+new ResizeObserver(resize).observe(viewer);
+(function loop() { requestAnimationFrame(loop); controls.update(); renderer.render(scene, camera); })();
+
+// Display mapping (right-handed, y up). ENU (E,N,U) -> (E, U, -N).
+// Model frame (OpenCV first camera: x right, y down, z forward/down) -> (x, -z, y).
+function toDisplay(frame) {
+  return frame.startsWith('local ENU') ? ([x, y, z]) => [x, z, -y] : ([x, y, z]) => [x, -z, y];
+}
+
+function clearScene() {
+  for (const o of [cloud, cams]) if (o) { scene.remove(o); o.geometry.dispose(); o.material.dispose(); }
+  cloud = cams = full = null;
+  $('empty').style.display = ''; $('banner').style.display = 'none'; $('overlay').style.display = 'none';
+}
+
+function buildCloud() {
+  if (cloud) { scene.remove(cloud); cloud.geometry.dispose(); cloud.material.dispose(); }
+  const hide = $('hideLow').checked, mode = document.querySelector('input[name=cmode]:checked').value;
+  const n = full.mvc.length, pos = [], col = [];
+  const lo = new THREE.Color(0xE0932A), hi = new THREE.Color(0x0070C0), c = new THREE.Color();
+  let shown = 0;
+  for (let i = 0; i < n; i++) {
+    if (hide && full.mvc[i] < 0.5) continue;
+    pos.push(full.pos[3*i], full.pos[3*i+1], full.pos[3*i+2]);
+    if (mode === 'mvc') { c.copy(lo).lerp(hi, full.mvc[i]); col.push(c.r, c.g, c.b); }
+    else col.push(full.col[3*i], full.col[3*i+1], full.col[3*i+2]);
+    shown++;
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+  cloud = new THREE.Points(g, new THREE.PointsMaterial({ size: +$('psize').value * 0.06 * full.unit, vertexColors: true }));
+  scene.add(cloud);
+  $('overlay').textContent = `${shown.toLocaleString()} of ${n.toLocaleString()} points shown · drag to orbit, right-drag to pan, scroll to zoom`;
+  $('legendBox').style.display = mode === 'mvc' ? '' : 'none';
+}
+
+async function showResult(job) {
+  clearScene();
+  const m = job.metrics, map = toDisplay(m.coordinate_frame);
+  const loader = new PLYLoader();
+  loader.setCustomPropertyNameMapping({ mvc: ['mv_consistency'] });
+  const [geom, camsJson] = await Promise.all([
+    loader.loadAsync(urlFile(job.id, 'cloud.ply')),
+    fetch(urlFile(job.id, 'cameras.json')).then(r => r.json()),
+  ]);
+  if (currentJob !== job.id) return;  // user switched job while loading
+  const p = geom.attributes.position.array, n = p.length / 3, pos = new Float32Array(p.length);
+  for (let i = 0; i < n; i++) { const q = map([p[3*i], p[3*i+1], p[3*i+2]]); pos.set(q, 3*i); }
+  const box = new THREE.Box3().setFromArray(pos), centre = box.getCenter(new THREE.Vector3()), size = box.getSize(new THREE.Vector3());
+  for (let i = 0; i < n; i++) { pos[3*i] -= centre.x; pos[3*i+1] -= centre.y; pos[3*i+2] -= centre.z; }
+  const unit = Math.max(size.x, size.z) / 300;
+  full = { pos, col: geom.attributes.color.array, mvc: geom.attributes.mvc.array, unit };
+  buildCloud();
+
+  const cpos = [], lines = [];
+  for (const c of camsJson.cameras) {
+    const a = map(c.centre), f = map(c.forward);
+    const s = [a[0] - centre.x, a[1] - centre.y, a[2] - centre.z];
+    cpos.push(...s);
+    lines.push(...s, s[0] + f[0] * unit * 8, s[1] + f[1] * unit * 8, s[2] + f[2] * unit * 8);
+  }
+  const lg = new THREE.BufferGeometry();
+  lg.setAttribute('position', new THREE.Float32BufferAttribute(lines, 3));
+  cams = new THREE.LineSegments(lg, new THREE.LineBasicMaterial({ color: 0xffd166 }));
+  cams.visible = $('showCams').checked;
+  scene.add(cams);
+
+  homeView = { pos: new THREE.Vector3(0, Math.max(size.x, size.z) * 0.9, Math.max(size.x, size.z) * 0.7), target: new THREE.Vector3(0, 0, 0) };
+  resetView();
+  $('empty').style.display = 'none'; $('banner').style.display = 'block'; $('overlay').style.display = 'block';
+}
+
+function resetView() {
+  if (!homeView) return;
+  camera.position.copy(homeView.pos); controls.target.copy(homeView.target); controls.update();
+}
+
+const fmt = (x, d = 2) => x === null || x === undefined ? '—' : (typeof x === 'number' ? x.toFixed(d) : x);
+
+function renderJob(job) {
+  const stored = !sessionJobs.has(job.id);
+  const created = new Date(job.created * 1000).toLocaleTimeString();
+  const spin = job.state === 'running' || job.state === 'queued' ? ' <span class="spinner"></span>' : '';
+  $('jobInfo').innerHTML = `<div><span class="state ${job.state}">${job.state}</span>${spin}</div>
+    <div>${job.label}</div><div class="muted">${job.id}${stored ? ` · <b>stored run</b> created ${created}` : ''}</div>
+    ${job.error ? `<div class="note warn">${job.error}</div>` : ''}`;
+  $('cancel').disabled = !(job.state === 'running' || job.state === 'queued');
+
+  // Stages come only from the worker's event log.
+  const ends = {}, starts = [];
+  for (const e of job.events) { if (e.event === 'start') starts.push(e.stage); if (e.event === 'end') ends[e.stage] = e; }
+  $('stages').innerHTML = starts.map(s => ends[s]
+    ? `<li>${s.replaceAll('_', ' ')} — ${ends[s].seconds.toFixed(1)} s</li>`
+    : `<li>${s.replaceAll('_', ' ')} ${job.state === 'running' ? '<span class="spinner"></span>' : '(not finished)'}</li>`).join('');
+
+  const acc = job.frames.filter(f => f.accepted).length;
+  $('framesInfo').textContent = job.frames.length
+    ? `${acc} of ${job.frames.length} frames used. Selector: quality-filtered interval sampling (not parallax-aware).` : '';
+  $('frames').innerHTML = job.frames.map(f => `<figure class="${f.accepted ? '' : 'rej'}" title="${f.source}: ${f.reason}${f.gps ? '' : ' · no GPS'}">
+    <img src="${urlFile(job.id, f.thumb)}" loading="lazy"><figcaption>${f.source}</figcaption></figure>`).join('');
+
+  if (job.state !== 'succeeded') { $('summary').textContent = '—'; $('geo').textContent = '—'; return; }
+  const m = job.metrics, g = job.georef, st = m.stage_seconds;
+  $('summary').innerHTML = `<table>
+    <tr><td>Result</td><td><b>${m.result_type}</b></td></tr>
+    <tr><td>Backend</td><td>${m.backend}</td></tr>
+    <tr><td>Input</td><td>${m.input_label}</td></tr>
+    <tr><td>Frames used</td><td>${m.accepted_frames} of ${m.candidate_frames} (${m.frames_with_gps} with GPS)</td></tr>
+    <tr><td>Points</td><td>${m.points_exported.toLocaleString()} (from ${m.points_before_downsample.toLocaleString()}, voxel ${fmt(m.voxel_size, 3)})</td></tr>
+    <tr><td>Total processing</td><td>${fmt(m.total_seconds, 1)} s</td></tr>
+    <tr><td>— model load</td><td>${fmt(st.model_load, 1)} s</td></tr>
+    <tr><td>— reconstruction</td><td>${fmt(st.reconstruct, 1)} s</td></tr>
+    <tr><td>Peak GPU memory</td><td>${fmt(m.peak_gpu_memory_gb, 1)} GB</td></tr>
+    <tr><td>Model resolution</td><td>${m.model_resolution_hw.join(' × ')} px</td></tr>
+    <tr><td>Coordinates</td><td>${m.coordinate_frame}</td></tr>
+    <tr><td>Scale source</td><td>${m.scale_source}</td></tr>
+    <tr><td>Geolocation</td><td>${m.geolocation}</td></tr>
+    <tr><td>Validation</td><td>${m.validation_status}</td></tr>
+    <tr><td>Measurement</td><td>${m.measurement}</td></tr>
+  </table>
+  <a class="dl" href="${urlFile(job.id, 'cloud.ply')}" download><button>Download PLY</button></a>
+  <a class="dl" href="${urlFile(job.id, 'artifact_manifest.json')}" target="_blank">manifest</a>`;
+
+  if (g.status === 'applied') {
+    $('geo').innerHTML = `<table>
+      <tr><td>Status</td><td>post-hoc alignment applied</td></tr>
+      <tr><td>Cameras used</td><td>${g.inliers} of ${g.num_cameras_with_gps}</td></tr>
+      <tr><td>GPS residual RMSE</td><td>${fmt(g.residual_rmse_m)} m (max ${fmt(g.residual_max_m)})</td></tr>
+      <tr><td>Leave-one-out RMSE</td><td>${fmt(g.leave_one_out_rmse_m)} m</td></tr>
+      <tr><td>GPS scale ÷ model scale</td><td>${fmt(g.scale, 2)}×</td></tr>
+      <tr><td>Origin</td><td>${g.enu_origin_lat_lon_alt.map(v => v.toFixed(6)).join(', ')}</td></tr>
+      <tr><td>Altitude</td><td>${g.altitude_type}</td></tr></table>
+      <div class="note">Residuals show agreement with the input GPS, not ground accuracy.</div>`;
+  } else if (g.status === 'degenerate_near_collinear') {
+    $('geo').innerHTML = `<div class="note warn"><b>Not geolocated.</b> ${g.reason}</div>
+      <table><tr><td>Trajectory s₂/s₁</td><td>${fmt(g.gps_trajectory_s2_over_s1, 4)}</td></tr>
+      <tr><td>GPS scale ÷ model scale</td><td>${fmt(g.gps_scale_factor, 2)}×</td></tr></table>`;
+  } else {
+    $('geo').innerHTML = `<div class="note warn">${g.reason || g.status}. Output is in the model's own frame with its learned scale.</div>`;
+  }
+}
+
+async function poll(id) {
+  clearTimeout(pollTimer);
+  const job = await fetch(urlJob(id)).then(r => r.json());
+  if (currentJob !== id) return;
+  renderJob(job);
+  if (job.state === 'succeeded') { if (!cloud) await showResult(job); }
+  else { if (cloud) clearScene(); if (job.state === 'running' || job.state === 'queued') pollTimer = setTimeout(() => poll(id), 1000); else refreshHistory(); }
+  if (job.state === 'succeeded') refreshHistory();
+}
+
+function selectJob(id) { currentJob = id; clearScene(); poll(id); }
+
+async function refreshHistory() {
+  const list = await fetch(urlList()).then(r => r.json());
+  $('history').innerHTML = (STATIC ? '' : '<option value="">— select a stored run —</option>') + list.map(j =>
+    `<option value="${j.id}" ${j.id === currentJob ? 'selected' : ''}>${new Date(j.created * 1000).toLocaleTimeString()} · ${j.state} · ${j.label.slice(0, 40)}</option>`).join('');
+}
+
+$('run').onclick = async () => {
+  const fd = new FormData(), files = $('files').files;
+  if (files.length) for (const f of files) fd.append('files', f); else fd.append('sample', $('sample').value);
+  fd.append('max_views', $('maxViews').value); fd.append('sample_fps', $('fps').value);
+  $('run').disabled = true;
+  const r = await fetch('/api/jobs', { method: 'POST', body: fd });
+  $('run').disabled = false;
+  if (!r.ok) { const d = (await r.json().catch(() => ({}))).detail; $('jobInfo').innerHTML = `<div class="note warn">${typeof d === 'string' ? d : 'Could not start the job.'}</div>`; return; }
+  const { id } = await r.json();
+  sessionJobs.add(id); selectJob(id); refreshHistory();
+};
+$('cancel').onclick = () => currentJob && fetch(`/api/jobs/${currentJob}/cancel`, { method: 'POST' }).then(() => poll(currentJob));
+$('history').onchange = e => e.target.value && selectJob(e.target.value);
+$('reset').onclick = resetView;
+$('showCams').onchange = e => { if (cams) cams.visible = e.target.checked; };
+$('psize').oninput = () => { if (cloud) cloud.material.size = +$('psize').value * 0.06 * full.unit; };
+$('hideLow').onchange = () => full && buildCloud();
+document.querySelectorAll('input[name=cmode]').forEach(r => r.onchange = () => full && buildCloud());
+
+if (!STATIC) fetch('/api/samples').then(r => r.json()).then(s => {
+  $('sample').innerHTML = Object.entries(s).map(([k, v]) => `<option value="${k}">${v.label}</option>`).join('');
+});
+refreshHistory().then(async () => {
+  if (!STATIC) return;
+  const first = (await fetch(urlList()).then(r => r.json()))[0];
+  if (first) { $('history').value = first.id; selectJob(first.id); }
+});
+</script>
+</body>
+</html>
