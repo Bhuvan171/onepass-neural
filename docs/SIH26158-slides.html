@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SIH26158 — OnePass</title>
+<style>
+  @page { size: 720pt 405pt; margin: 0; }
+  :root {
+    --navy: #1F497D; --blue: #1F6FB4; --bar: #1F7AC4; --barnum: #1665A8;
+    --pill: #E8F0FA; --line: #C9D6E5; --alt: #F2F6FB; --muted: #6B7785;
+    --green: #2E9E5B; --amber: #C8781F;
+    --serif: Georgia, "Times New Roman", serif;
+    --sans: Arial, Helvetica, sans-serif;
+  }
+  * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  html, body { margin: 0; padding: 0; background: #8a929c; }
+  body { font-family: var(--sans); color: #1b2733; font-size: 8.4pt; line-height: 1.34; }
+
+  .slide {
+    position: relative; width: 720pt; height: 405pt; background: #fff; overflow: hidden;
+    padding: 30pt 34pt 30pt 34pt; margin: 0 auto; page-break-after: always; break-after: page;
+  }
+  .slide:last-child { page-break-after: auto; break-after: auto; }
+
+  .pill { position: absolute; top: 13pt; left: 30pt; background: var(--pill); color: var(--navy);
+          font-size: 7pt; font-weight: 700; padding: 3.5pt 9pt; border-radius: 9pt; letter-spacing: .02em; }
+  .sih  { position: absolute; top: 13pt; right: 34pt; font-size: 6.6pt; color: #5a6675; letter-spacing: .04em; }
+  .foot { position: absolute; left: 0; right: 0; bottom: 0; height: 21pt; background: var(--bar);
+          color: #fff; font-size: 7.4pt; display: flex; align-items: center; justify-content: center; }
+  .foot b { position: absolute; left: 0; top: 0; bottom: 0; width: 34pt; background: var(--barnum);
+            display: flex; align-items: center; justify-content: center; font-size: 8pt; }
+
+  h1 { font-family: var(--serif); color: var(--navy); font-size: 21pt; line-height: 1.12; margin: 0 0 3pt; letter-spacing: .01em; }
+  .sub { color: var(--muted); font-size: 7.4pt; font-style: italic; margin: 0 0 11pt; }
+  .kicker { font-size: 7pt; font-weight: 700; color: #5a6675; letter-spacing: .09em; margin: 0 0 5pt; }
+  h3 { font-size: 7.2pt; font-weight: 700; color: var(--navy); letter-spacing: .07em; margin: 0 0 4pt;
+       padding-bottom: 2.5pt; border-bottom: 1.2pt solid var(--navy); }
+
+  table { width: 100%; border-collapse: collapse; }
+  th { background: var(--navy); color: #fff; font-size: 7pt; text-align: left; padding: 4pt 6pt; font-weight: 700; }
+  td { padding: 4pt 6pt; border: .6pt solid var(--line); vertical-align: top; font-size: 7.4pt; }
+  tr:nth-child(even) td { background: var(--alt); }
+
+  ul { margin: 0; padding-left: 11pt; }
+  li { margin: 0 0 3pt; }
+  .note { font-size: 6.6pt; color: var(--muted); margin-top: 4pt; }
+  .quote { font-family: var(--serif); font-style: italic; font-weight: 700; color: var(--navy);
+           text-align: center; font-size: 8.6pt; line-height: 1.4; border-top: .6pt solid var(--line);
+           border-bottom: .6pt solid var(--line); padding: 7pt 30pt; margin: 0; }
+
+  /* ---- slide 1 ---- */
+  .s1 { display: grid; grid-template-columns: 1fr 300pt; gap: 30pt; align-items: center; height: 100%; padding: 0 0 0 6pt; }
+  .s1 h1 { font-size: 27pt; line-height: 1.06; margin-bottom: 13pt; }
+  .s1 h1 span { color: var(--blue); }
+  .s1 table td { border: 0; padding: 2.6pt 0; font-size: 7.8pt; background: none !important; }
+  .s1 table td:first-child { color: var(--navy); font-weight: 700; width: 118pt; }
+  .logobox { background: var(--pill); border-radius: 10pt; padding: 26pt 22pt; }
+  .logobox img { width: 100%; display: block; }
+
+  /* ---- slide 3 ---- */
+  .cols { display: grid; grid-template-columns: 1fr 268pt; gap: 14pt; }
+  .stage { display: grid; grid-template-columns: 13pt 1fr; gap: 5pt; margin-bottom: 3.2pt; }
+  .stage i { font-style: normal; font-weight: 700; color: #fff; background: var(--blue); font-size: 6.4pt;
+             width: 13pt; height: 13pt; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .stage b { color: var(--navy); font-size: 7.6pt; }
+  .stage p { margin: 0; font-size: 7pt; line-height: 1.32; }
+  .stage code { font-family: var(--sans); color: var(--muted); font-size: 6.5pt; }
+  .shot { width: 100%; display: block; border: .8pt solid var(--line); border-radius: 3pt; }
+  .measured { background: var(--pill); border-left: 2.4pt solid var(--blue); padding: 4.5pt 8pt; margin-top: 5pt; font-size: 7pt; }
+  .measured b { color: var(--navy); }
+  .planned { margin-top: 7pt; background: #F7F8FA; border: .6pt solid var(--line); border-radius: 3pt; padding: 4.5pt 8pt; font-size: 7pt; }
+  .planned li { margin-bottom: 1.8pt; }
+  .planned b { color: var(--amber); letter-spacing: .05em; font-size: 6.8pt; }
+
+  .tag { display: inline-block; font-size: 6.4pt; font-weight: 700; padding: 1.2pt 4.5pt; border-radius: 6pt; vertical-align: 1pt; }
+  .built { background: #E4F3EA; color: var(--green); }
+  .todo  { background: #FBF0E2; color: var(--amber); }
+
+  /* ---- slide 5 ---- */
+  .bars { background: #F7F9FC; border: .6pt solid var(--line); border-radius: 4pt; padding: 9pt 12pt; }
+  .bars h4 { font-family: var(--serif); color: var(--navy); font-size: 9.5pt; margin: 0 0 6pt; }
+  .barrow { display: grid; grid-template-columns: 62pt 1fr 92pt; align-items: center; gap: 7pt; margin-bottom: 3.4pt; font-size: 7pt; }
+  .track { background: #E3E9F0; height: 9pt; border-radius: 2pt; overflow: hidden; }
+  .fill { height: 100%; display: flex; align-items: center; justify-content: flex-end; padding-right: 5pt;
+          color: #fff; font-size: 6.4pt; font-weight: 700; }
+  .four { display: grid; grid-template-columns: repeat(4, 1fr); gap: 11pt; margin-top: 9pt; }
+  .four ul { padding-left: 9pt; } .four li { font-size: 7pt; }
+
+  /* ---- slide 6 ---- */
+  .refs { display: grid; grid-template-columns: 1fr 1fr; gap: 20pt; }
+  .refs ol { margin: 0; padding-left: 13pt; font-size: 7pt; line-height: 1.42; }
+  .refs li { margin-bottom: 3.4pt; }
+  .refs a { color: var(--blue); }
+  .refs i { color: #2b3948; }
+
+  @media screen { body { padding: 10pt 0; } .slide { box-shadow: 0 1pt 6pt rgba(0,0,0,.3); margin-bottom: 10pt; } }
+  @media print { html, body { background: #fff; } }
+</style>
+</head>
+<body>
+
+<!-- ============ 1 ============ -->
+<section class="slide">
+  <div class="s1">
+    <div>
+      <div class="kicker">TITLE PAGE</div>
+      <h1>SMART INDIA<br>HACKATHON<br><span>2026</span></h1>
+      <table>
+        <tr><td>Problem Statement ID</td><td>SIH26158</td></tr>
+        <tr><td>Problem Statement Title</td><td>Single-Pass Drone Video to Accurate 3D Model Generation System</td></tr>
+        <tr><td>Theme</td><td>Robotics and Drones</td></tr>
+        <tr><td>PS Category</td><td>Software</td></tr>
+        <tr><td>Organisation</td><td>National Technical Research Organisation (NTRO)</td></tr>
+        <tr><td>Team ID</td><td></td></tr>
+        <tr><td>Team Name</td><td>sixth harmony</td></tr>
+        <tr><td>Idea Title</td><td>OnePass: measurement-grade 3D from a single drone flight</td></tr>
+      </table>
+    </div>
+    <div class="logobox"><img src="screenshots/sih_logo.png" alt="Smart India Hackathon 2026"></div>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="slide">
+  <div class="pill">TEAM · sixth harmony</div><div class="sih">SIH 2026</div>
+  <div class="kicker">PROPOSED SOLUTION (DESCRIBE YOUR IDEA/SOLUTION/PROTOTYPE)</div>
+  <h1 style="font-size:19pt;margin-bottom:1pt">OnePass</h1>
+  <div style="color:var(--blue);font-weight:700;font-size:8.6pt;margin-bottom:9pt">Measurement-grade 3D from a single drone flight</div>
+
+  <p style="margin:0 0 9pt">In plain terms: fly a drone over an area <b>once</b>, and OnePass turns that one video into an
+  accurate, map-ready 3D model. No return trips, no markers placed on the ground first.</p>
+
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:20pt">
+    <div>
+      <h3>WHAT IT DOES</h3>
+      <ul>
+        <li>Builds a 3D model of terrain, buildings, roads and vegetation from one ordinary flight video</li>
+        <li>Produces three tiers from that one flight: a fast rough preview, a realistic 3D scene, and a survey-accurate model</li>
+        <li>Places the model at its real-world coordinates using the drone's own GPS and altitude sensor</li>
+      </ul>
+    </div>
+    <div>
+      <h3>WHY THIS MATTERS</h3>
+      <ul>
+        <li>Standard drone mapping needs several overlapping flights and physical ground markers placed beforehand (ref. 10)</li>
+        <li>In a disaster zone or restricted area, teams usually get one flight and no time to place markers</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="measured" style="margin-top:10pt">
+    <b>BUILT SO FAR <span class="tag built">TIER 1 RUNNING</span></b> — photos or video + telemetry → GPS-aligned coloured
+    point cloud in ~30 s, fully offline, with per-point confidence and a browser viewer.
+    Tiers 2–3 and measurement tools are <b>not</b> built. Details on slide 3.
+  </div>
+
+  <div class="quote" style="margin-top:9pt">A single pass cannot observe every surface. We separate measured geometry
+  from inferred geometry and let the operator see which is which.</div>
+
+  <div class="foot"><b>2</b>@SIH Idea submission- Template</div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="slide">
+  <div class="pill">TEAM · sixth harmony</div><div class="sih">SIH 2026</div>
+  <h1>TECHNICAL APPROACH</h1>
+  <div class="sub">Methodology and process for implementation (Flow Charts/Images/working prototype)</div>
+
+  <div class="cols">
+    <div>
+      <h3>NEURAL TRACK — IMPLEMENTED, RUNS END TO END <span class="tag built">BUILT</span></h3>
+      <div class="stage"><i>1</i><div><b>Ingest</b> <code>selection.py</code>
+        <p>ffmpeg decode at a fixed fps; EXIF GPS, or DJI SRT matched by timestamp (≤ 0.5 s gap, no interpolation).</p></div></div>
+      <div class="stage"><i>2</i><div><b>Select</b> <code>selection.py</code>
+        <p>Rejects blur (&lt; 25% of the set's median Laplacian variance) and bad exposure, then samples evenly to the frame budget.</p></div></div>
+      <div class="stage"><i>3</i><div><b>Reconstruct</b> <code>infer.py</code>
+        <p>MapAnything <code>map-anything-apache</code> @ 00f9c245, bf16 — one feed-forward pass over all views gives poses and depth. No bundle adjustment.</p></div></div>
+      <div class="stage"><i>4</i><div><b>Georeference</b> <code>georef.py</code>
+        <p>Umeyama similarity + RANSAC, camera centres to GPS in local ENU. Refuses near-collinear tracks (s₂/s₁ &lt; 0.1).</p></div></div>
+      <div class="stage"><i>5</i><div><b>Fuse and export</b> <code>fuse.py</code>
+        <p>Voxel downsample; binary PLY carrying per-point cross-view agreement, confidence and view id.</p></div></div>
+      <div class="stage"><i>6</i><div><b>Serve</b> <code>server.py</code>
+        <p>FastAPI worker, one cancellable subprocess per job; three.js viewer; hashed run manifests.</p></div></div>
+
+      <div class="measured"><b>MEASURED</b> — A100 80GB, 18 aerial photos: <b>1,134,767 points in 29.8 s</b>
+        (18.7 s model load, 5.9 s reconstruct), 11.1 GB peak GPU. Agreement with the photos' own GPS 1.43 m RMSE.
+        Offline run verified in a network-less namespace.</div>
+    </div>
+
+    <div>
+      <img class="shot" src="screenshots/static_demo_video_run.png" alt="OnePass viewer showing a reconstructed point cloud">
+      <div class="note">Working prototype: a stored run in the browser viewer — video + SRT, 18 frames,
+        1,025,708 points, camera poses in gold. Live: <b>bhuvan171.github.io/onepass-neural</b> (ref. 15).</div>
+
+      <div class="planned" style="margin-top:9pt">
+        <b>PLANNED — NOT IMPLEMENTED</b>
+        <ul style="margin-top:3pt">
+          <li>Parallax-aware keyframe selection (current selector is interval-based)</li>
+          <li>Same frames through the COLMAP track; report inter-method agreement</li>
+          <li>Tier 2–3: dense MVS / Gaussian splatting, Poisson mesh</li>
+          <li>Moving-object masking; LAS/GLB/OBJ/GeoTIFF export; measurement tools</li>
+          <li>Independent accuracy evaluation against surveyed checkpoints</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="note" style="margin-top:7pt;font-style:italic;text-align:center;border-top:.6pt solid var(--line);padding-top:5pt">
+    Fully offline and on-premise — no cloud service, no external API. Weights are the <b>Apache-2.0</b> MapAnything
+    checkpoint; the CC-BY-NC checkpoint is never downloaded. Two dependencies (plyfile GPL-3.0, system FFmpeg) are still under licence review.
+  </div>
+
+  <div class="foot"><b>3</b>@SIH Idea submission- Template</div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="slide">
+  <div class="pill">TEAM · sixth harmony</div><div class="sih">SIH 2026</div>
+  <h1>FEASIBILITY AND VIABILITY</h1>
+  <div class="sub">Analysis of the feasibility of the idea</div>
+
+  <div class="kicker">MEASURED ON OUR OWN SYSTEM — 18-photo aerial sample, one A100 (ref. 15)</div>
+  <table>
+    <tr><th style="width:27%">What we measured</th><th style="width:36%">Result</th><th>What it does not show</th></tr>
+    <tr><td>End-to-end reconstruction</td><td>1.13 M coloured points in 29.8 s (5.9 s inference)</td>
+        <td>One sample, and a photo set — not a full-length flight video</td></tr>
+    <tr><td>Agreement with the photos' own GPS</td><td>1.43 m RMSE; 1.62 m leave-one-out</td>
+        <td><b>Agreement with input GPS, not ground accuracy.</b> No surveyed checkpoints exist for this sample</td></tr>
+    <tr><td>Learned metric scale vs GPS</td><td>3.96× too small; GPS alignment corrects it</td>
+        <td>Confirms the model's own scale cannot be trusted on aerial scenes</td></tr>
+    <tr><td>Degenerate input handling</td><td>Single flight line refused (s₂/s₁ = 0.009)</td>
+        <td>Refusal is the correct result, not a reconstruction</td></tr>
+  </table>
+
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:16pt;margin-top:10pt">
+    <div>
+      <h3>NEXT GATE</h3>
+      <ul>
+        <li>A <b>real</b> drone video with its SRT through the upload path (only a synthetic video has been tested)</li>
+        <li>Same frames through the COLMAP track — inter-method agreement</li>
+        <li>Independent accuracy on a benchmark with ground truth (UseGeo, ref. 1–3)</li>
+      </ul>
+      <div class="note">Published work reports newer feed-forward methods leaving ~19% fewer blank patches than the
+        standard method (ref. 1); that study did not use GPS. We have not reproduced it on our system.</div>
+    </div>
+    <div>
+      <h3>RISKS AND MITIGATIONS</h3>
+      <table>
+        <tr><th style="width:44%">Risk</th><th>Mitigation and status</th></tr>
+        <tr><td>Shape uncertain with one flight path</td><td>Refuses to geolocate collinear tracks <span class="tag built">BUILT</span></td></tr>
+        <tr><td>Learned scale unreliable</td><td>Post-hoc GPS similarity <span class="tag built">BUILT</span></td></tr>
+        <tr><td>Unseen / occluded surfaces</td><td>Per-point cross-view agreement, filterable <span class="tag built">BUILT</span></td></tr>
+        <tr><td>Moving vehicles and people</td><td>Segmentation + motion masking <span class="tag todo">PLANNED</span></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="foot"><b>4</b>@SIH Idea submission- Template</div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="slide">
+  <div class="pill">TEAM · sixth harmony</div><div class="sih">SIH 2026</div>
+  <h1>IMPACT AND BENEFITS</h1>
+  <div class="sub">Potential impact on the target audience · Benefits of the solution (social, economic, environmental, etc.)</div>
+
+  <div class="bars">
+    <h4>The bottleneck: time</h4>
+    <div class="kicker" style="margin-bottom:4pt">MOBILIZATION &amp; ASSESSMENT</div>
+    <div class="barrow"><span>Traditional</span><div class="track"><div class="fill" style="width:100%;background:var(--bar)">7 days</div></div><span>&nbsp;</span></div>
+    <div class="barrow"><span>AI-assisted</span><div class="track"><div class="fill" style="width:13%;background:var(--green)"></div></div><span><b>1 day</b> · &gt;90% less</span></div>
+    <div class="kicker" style="margin:7pt 0 4pt">PROCESSING AT SCALE (2,000 SITES)</div>
+    <div class="barrow"><span>Traditional</span><div class="track"><div class="fill" style="width:100%;background:var(--bar)">Hours</div></div><span>&nbsp;</span></div>
+    <div class="barrow"><span>AI-assisted</span><div class="track"><div class="fill" style="width:5%;background:var(--green)"></div></div><span><b>7 minutes</b> · &gt;99% less</span></div>
+    <div class="note">Sources: SkyeBrowse (2026) processing benchmark, ref. 14; Texas A&amp;M / Project CLARKE
+      mobilization benchmark, ref. 12 — both external. <b>Our own measured run:</b> 18 aerial views → 1.13 M points in 29.8 s on one A100 (ref. 15).</div>
+  </div>
+
+  <div class="four">
+    <div><h3>OPERATIONAL</h3><ul>
+      <li>Removes the ground-marker survey step (ref. 13)</li>
+      <li>Runs on-premise and offline, at the point of capture — verified</li></ul></div>
+    <div><h3>SECTORS</h3><ul>
+      <li>Disaster/flood response: 119 drone flights already mapped one hurricane's damage (ref. 12)</li>
+      <li>Border mapping, infrastructure, archaeology</li></ul></div>
+    <div><h3>ECONOMIC</h3><ul>
+      <li>Skips a survey crew + RTK-GPS gear, $1,000–2,000 per site-day (ref. 13)</li>
+      <li>No repeat flights, no per-seat licence</li></ul></div>
+    <div><h3>ENVIRONMENTAL &amp; SOCIAL</h3><ul>
+      <li>Fewer flight hours per survey</li>
+      <li>Same-day response vs 3–7 days traditionally (ref. 11)</li></ul></div>
+  </div>
+
+  <div class="foot"><b>5</b>@SIH Idea submission- Template</div>
+</section>
+
+<!-- ============ 6 ============ -->
+<section class="slide">
+  <div class="pill">TEAM · sixth harmony</div><div class="sih">SIH 2026</div>
+  <h1>RESEARCH AND REFERENCES</h1>
+  <div class="sub">Details / Links of the reference and research work</div>
+
+  <div class="refs">
+    <ol>
+      <li>Wu, Landgraf, Ulrich &amp; Qin (2025). <i>An Evaluation of DUSt3R/MASt3R/VGGT 3D Reconstruction on Photogrammetric Aerial Blocks.</i> arXiv:2507.14798</li>
+      <li>UseGeo benchmark: <a href="https://github.com/3DOM-FBK/UseGeo">github.com/3DOM-FBK/UseGeo</a></li>
+      <li>UseGeo official evaluation code: <a href="https://github.com/UseGeoEvaluation">github.com/UseGeoEvaluation</a></li>
+      <li>Florea, Miclea &amp; Nedevschi (2021). <i>WildUAV: Monocular UAV Dataset for Depth Estimation Tasks.</i> IEEE ICCP: <a href="https://github.com/hrflr/wuav">github.com/hrflr/wuav</a></li>
+      <li>GauU-Scene / U-Scene: large-scale UAV dataset with LiDAR ground truth</li>
+      <li>OpenDroneMap example datasets: <a href="https://github.com/OpenDroneMap/ODMdata">github.com/OpenDroneMap/ODMdata</a></li>
+      <li><i>Effective Strategies for Mitigating the Bowl Effect in UAV Photogrammetry for Corridor Projects.</i> Drones 9(6):387 (2025)</li>
+      <li>Ferrer-González et al. <i>UAV Photogrammetry Accuracy Assessment for Corridor Mapping.</i> Remote Sensing 12(15):2447 (2020)</li>
+    </ol>
+    <ol start="9">
+      <li>Atik (2025). Evaluation of NeRF and Gaussian Splatting point clouds against photogrammetric reference. Sensors 25(10):2995</li>
+      <li>ScienceDirect (2025). <i>Optimal ground control point layout for UAV photogrammetry in high-precision 3D mapping.</i></li>
+      <li>Overwatch Mapping (2026). <i>Drone response to storms and disasters: how aerial capture compresses the damage-assessment timeline.</i></li>
+      <li>DroneLife (2025). <i>Drone disaster response project CLARKE</i>, cites CRASAR/Texas A&amp;M's 119-flight Hurricane Harvey deployment.</li>
+      <li>Aerocartwright (2026). <i>GCP setup for non-surveyors</i>, ground-control crew and equipment cost estimates.</li>
+      <li>SkyeBrowse (2026). Drone-to-3D processing time benchmark at scale.</li>
+      <li><b>Team repository and measured runs:</b> <a href="https://github.com/Bhuvan171/onepass-neural">github.com/Bhuvan171/onepass-neural</a><br>
+        Live viewer: <a href="https://bhuvan171.github.io/onepass-neural/">bhuvan171.github.io/onepass-neural</a><br>
+        Every figure on slides 3–5 is reproduced in <i>BUILD_STATUS.md</i>; permitted claims and their limits in <i>CLAIMS.md</i>.</li>
+    </ol>
+  </div>
+
+  <div class="foot"><b>6</b>@SIH Idea submission- Template</div>
+</section>
+
+</body>
+</html>
