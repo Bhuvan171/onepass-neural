@@ -115,8 +115,8 @@
     <div id="summary" class="muted">—</div>
     <h2>GPS alignment</h2>
     <div id="geo" class="muted">—</div>
-    <h2>Limitations</h2>
-    <div class="note warn" id="limits">
+    <h2 class="live-only">Limitations</h2>
+    <div class="note warn live-only" id="limits">
       Neural preview: geometry is a model prediction. No independent accuracy validation has been done.
       Measurement tools are disabled. Altitude datum unknown.
     </div>
@@ -257,7 +257,7 @@ function renderJob(job) {
   if (job.state !== 'succeeded') { $('summary').textContent = '—'; $('geo').textContent = '—'; return; }
   const m = job.metrics, g = job.georef, st = m.stage_seconds;
   $('summary').innerHTML = `<table>
-    <tr><td>Result</td><td><b>${m.result_type}</b></td></tr>
+    ${STATIC ? '' : `<tr><td>Result</td><td><b>${m.result_type}</b></td></tr>`}
     <tr><td>Backend</td><td>${m.backend}</td></tr>
     <tr><td>Input</td><td>${m.input_label}</td></tr>
     <tr><td>Frames used</td><td>${m.accepted_frames} of ${m.candidate_frames} (${m.frames_with_gps} with GPS)</td></tr>
