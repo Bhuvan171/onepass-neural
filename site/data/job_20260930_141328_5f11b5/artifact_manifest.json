@@ -1,0 +1,42 @@
+{
+  "artifacts": {
+    "cloud.ply": {
+      "sha256": "5f8490a09e171b142294c7f0869ee0f67ea617132b0737936c2a5e1cefeb472a",
+      "bytes": 12552335
+    },
+    "cameras.json": {
+      "sha256": "af6909c96721c47d76e7237520223e6c7681ab632c3d1ba2d6554ed91aa1d347",
+      "bytes": 2454
+    },
+    "georef.json": {
+      "sha256": "c9b0234e7707184dabf32b06d543ed8f5c7aab8910f2a8b0d2c20522b8644564",
+      "bytes": 834
+    },
+    "metrics.json": {
+      "sha256": "71ca70e316e02b1bd60072e42a916269cf4cae7768839351932e308c592520f5",
+      "bytes": 1233
+    },
+    "frames.jsonl": {
+      "sha256": "e53e58a53c5beebc8b45c3322704b1e7aed92970241b64e3f6e4aaa833975afa",
+      "bytes": 1982
+    },
+    "input_manifest.json": {
+      "sha256": "6b00f44a1a8acb38cfaba50979e9b109e1fa22593a99be0fde17e894bd5ff2a4",
+      "bytes": 1033
+    },
+    "config.json": {
+      "sha256": "b42ce69d8086dbb028d5c243dcc548c651743c179860c549c31d333c93aa1720",
+      "bytes": 389
+    },
+    "environment.json": {
+      "sha256": "9dc7dcf73df4cc44e1385caf7ec237c4ae2a1eebdf4f0562010ec8dfd238cd4b",
+      "bytes": 467
+    }
+  },
+  "cloud_ply_fields": "x y z (float32, coordinate_frame), red green blue, mv_consistency (fraction of overlapping views whose predicted depth agrees; model self-consistency, not independent triangulation), model_conf (learned confidence), view_id",
+  "coordinate_frame": "model frame (first camera, OpenCV axes) rescaled by GPS spread ratio; not geolocated",
+  "scale_source": "gps_spread_ratio (degenerate trajectory, rotation unconstrained)",
+  "geolocation": "none",
+  "validation_status": "unvalidated",
+  "backend": "MapAnything feed-forward reconstruction (facebook/map-anything-apache@00f9c245)"
+}

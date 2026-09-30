@@ -1,0 +1,70 @@
+{
+  "method": "post-hoc similarity georegistration (Umeyama + RANSAC) of predicted camera centres to GPS",
+  "num_cameras_with_gps": 18,
+  "gps_trajectory_singular_values_m": [
+    98.665,
+    87.912,
+    0.345
+  ],
+  "gps_trajectory_s2_over_s1": 0.891,
+  "validation_status": "unvalidated",
+  "note": "Residuals measure agreement with input GPS, not ground-truth accuracy.",
+  "status": "applied",
+  "applied": true,
+  "scale": 3.9591440246795373,
+  "rotation": [
+    [
+      0.7421499257325938,
+      -0.6702289732406634,
+      0.0025712183630252857
+    ],
+    [
+      -0.6701172754948412,
+      -0.7419437564625153,
+      0.021501147170837853
+    ],
+    [
+      -0.012502992380858679,
+      -0.017680092620135555,
+      -0.9997655172621567
+    ]
+  ],
+  "translation": [
+    0.22689820940311733,
+    -0.2668706835664221,
+    -0.08009701347916018
+  ],
+  "inliers": 18,
+  "inlier_threshold_m": 5.0,
+  "residual_rmse_m": 1.432,
+  "residual_max_m": 2.149,
+  "residuals_m": [
+    0.362,
+    0.257,
+    0.187,
+    0.913,
+    1.257,
+    1.753,
+    2.149,
+    1.504,
+    1.447,
+    1.531,
+    2.036,
+    2.044,
+    1.603,
+    1.352,
+    1.053,
+    1.314,
+    1.598,
+    1.336
+  ],
+  "leave_one_out_rmse_m": 1.619,
+  "leave_one_out_max_m": 2.443,
+  "enu_origin_lat_lon_alt": [
+    46.842607083333334,
+    -91.99455988888889,
+    198.309
+  ],
+  "altitude_type": "EXIF GPSAltitude (datum unknown)",
+  "learned_to_gps_scale_ratio": 3.9591440246795373
+}

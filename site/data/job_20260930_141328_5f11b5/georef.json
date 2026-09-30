@@ -1,0 +1,23 @@
+{
+  "method": "post-hoc similarity georegistration (Umeyama + RANSAC) of predicted camera centres to GPS",
+  "num_cameras_with_gps": 6,
+  "gps_trajectory_singular_values_m": [
+    57.007,
+    0.539,
+    0.102
+  ],
+  "gps_trajectory_s2_over_s1": 0.0094,
+  "validation_status": "unvalidated",
+  "note": "Residuals measure agreement with input GPS, not ground-truth accuracy.",
+  "status": "degenerate_near_collinear",
+  "applied": false,
+  "gps_scale_factor": 3.7554,
+  "reason": "GPS positions lie nearly on a line; rotation about the flight line is not determined, so no geographic placement is applied. Only a GPS-derived scale is reported.",
+  "enu_origin_lat_lon_alt": [
+    46.842607083333334,
+    -91.99455988888889,
+    198.309
+  ],
+  "altitude_type": "EXIF GPSAltitude (datum unknown)",
+  "learned_to_gps_scale_ratio": 3.7554
+}

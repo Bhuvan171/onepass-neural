@@ -2,7 +2,7 @@
 .hf/
 .torch/
 third_party/
-data/
+/data/
 runs/
 __pycache__/
 .pytest_cache/

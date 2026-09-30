@@ -1,0 +1,35 @@
+{
+  "backend": "MapAnything feed-forward reconstruction (facebook/map-anything-apache@00f9c245)",
+  "result_type": "AI preview \u2014 spatial accuracy not validated",
+  "input_label": "Public photo set: Brighton Beach, first flight line only, 6 images (not video)",
+  "input_type": "image_set",
+  "candidate_frames": 6,
+  "accepted_frames": 6,
+  "frames_with_gps": 6,
+  "points_before_downsample": 860838,
+  "points_exported": 502083,
+  "voxel_size": 0.1516,
+  "coordinate_frame": "model frame (first camera, OpenCV axes) rescaled by GPS spread ratio; not geolocated",
+  "scale_source": "gps_spread_ratio (degenerate trajectory, rotation unconstrained)",
+  "geolocation": "none",
+  "validation_status": "unvalidated",
+  "georef_status": "degenerate_near_collinear",
+  "georef_rmse_m": null,
+  "georef_loo_rmse_m": null,
+  "learned_to_gps_scale_ratio": 3.7554,
+  "mv_consistency_ge_0_5_fraction": 0.454,
+  "stage_seconds": {
+    "ingest_and_select": 0.808,
+    "model_load": 18.334,
+    "reconstruct": 2.136,
+    "georegister": 0.053,
+    "fuse_export": 0.597
+  },
+  "total_seconds": 21.93,
+  "model_resolution_hw": [
+    294,
+    518
+  ],
+  "peak_gpu_memory_gb": 7.01,
+  "measurement": "disabled (no independently validated scale)"
+}

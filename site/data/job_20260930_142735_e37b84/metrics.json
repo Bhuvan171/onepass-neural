@@ -1,0 +1,35 @@
+{
+  "backend": "MapAnything feed-forward reconstruction (facebook/map-anything-apache@00f9c245)",
+  "result_type": "AI preview \u2014 spatial accuracy not validated",
+  "input_label": "Uploaded video brighton_SYNTHETIC_from_photos.mp4 with SRT telemetry",
+  "input_type": "video",
+  "candidate_frames": 18,
+  "accepted_frames": 18,
+  "frames_with_gps": 18,
+  "points_before_downsample": 2607293,
+  "points_exported": 1025708,
+  "voxel_size": 0.1815,
+  "coordinate_frame": "local ENU metres (x east, y north, z up) about enu_origin_lat_lon_alt; vertical datum unknown",
+  "scale_source": "sensor_constrained (post-hoc GPS similarity)",
+  "geolocation": "post-hoc georegistration (unvalidated)",
+  "validation_status": "unvalidated",
+  "georef_status": "applied",
+  "georef_rmse_m": 0.664,
+  "georef_loo_rmse_m": 0.887,
+  "learned_to_gps_scale_ratio": 4.471189196887958,
+  "mv_consistency_ge_0_5_fraction": 0.638,
+  "stage_seconds": {
+    "ingest_and_select": 3.994,
+    "model_load": 20.632,
+    "reconstruct": 3.686,
+    "georegister": 0.35,
+    "fuse_export": 2.162
+  },
+  "total_seconds": 30.83,
+  "model_resolution_hw": [
+    294,
+    518
+  ],
+  "peak_gpu_memory_gb": 11.08,
+  "measurement": "disabled (no independently validated scale)"
+}
