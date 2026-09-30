@@ -222,7 +222,7 @@ async function showResult(job) {
 
   homeView = { pos: new THREE.Vector3(0, Math.max(size.x, size.z) * 0.9, Math.max(size.x, size.z) * 0.7), target: new THREE.Vector3(0, 0, 0) };
   resetView();
-  $('empty').style.display = 'none'; $('banner').style.display = 'block'; $('overlay').style.display = 'block';
+  $('empty').style.display = 'none'; $('banner').style.display = STATIC ? 'none' : 'block'; $('overlay').style.display = 'block';
 }
 
 function resetView() {

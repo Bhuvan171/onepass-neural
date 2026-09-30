@@ -5,7 +5,9 @@ Drone photos or video (+ optional DJI SRT telemetry) → selected frames → **M
 feed-forward reconstruction (Apache-2.0 checkpoint) → post-hoc GPS alignment → coloured
 point cloud in a local browser viewer, with PLY download and run manifests.
 
-Every result is labelled **"AI preview — spatial accuracy not validated"**. Measurement is disabled.
+**Live demo (static): https://bhuvan171.github.io/onepass-neural/**: an interactive viewer of pre-computed results, see [Limitations](#limitations).
+
+Every result in the live app is labelled **"AI preview — spatial accuracy not validated"**. Measurement is disabled.
 
 ## Run it
 
@@ -54,3 +56,10 @@ Tests (GPU needed for the integration test): `HF_HOME=$PWD/.hf HF_HUB_OFFLINE=1 
 - Viewer mapping: ENU (E,N,U) → three.js (E,U,−N); model frame (x,y,z) → (x,−z,y); centred before rendering.
 
 See `BUILD_STATUS.md` for measured results and `CLAIMS.md` before writing any slide text.
+
+## Limitations
+
+- **AI preview — spatial accuracy not validated.** The geometry is a neural-network prediction. No independent accuracy validation (survey checkpoints, ground truth) has been done, GPS residuals only show agreement with the input GPS, and measurement tools are disabled. The altitude datum is unknown.
+- **The hosted demo is not running the reconstruction.** Reconstruction needs an NVIDIA GPU (developed and measured on an A100), which free hosting does not provide. The GitHub Pages site is a static viewer of outputs from successful reconstructions run beforehand on the GPU machine (the Brighton Beach sample photos and a synthetic video made from them). You cannot upload your own images or video there. To run it for real, use `scripts/setup.sh` and `scripts/serve.sh` on a GPU machine.
+- The demo runs are a public photo set and a *synthetic* video built from it, not real drone video. See [BUILD_STATUS.md](BUILD_STATUS.md) for measured results.
+- Learned metric scale is unreliable on aerial scenes (~4× off on the sample), so GPS alignment is required for usable scale. Frame selection is not parallax-aware.
